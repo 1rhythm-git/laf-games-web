@@ -1,3 +1,5 @@
+export const SITE_URL = 'https://lafgames.com'
+
 export const CONTACT_EMAIL: string | null = null
 
 export const LEGAL_LAST_UPDATED = {

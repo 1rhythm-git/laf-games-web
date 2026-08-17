@@ -1,5 +1,6 @@
 import { useEffect } from 'react'
 import { useLocation } from 'react-router-dom'
+import { SITE_URL } from '../../config/site'
 
 type Metadata = {
   title: string
@@ -38,16 +39,25 @@ function updateMetaContent(selector: string, content: string) {
   document.querySelector<HTMLMetaElement>(selector)?.setAttribute('content', content)
 }
 
+function updateLinkHref(selector: string, href: string) {
+  document.querySelector<HTMLLinkElement>(selector)?.setAttribute('href', href)
+}
+
 export function PageMeta() {
   const { pathname } = useLocation()
 
   useEffect(() => {
     const metadata = pageMetadata[pathname] ?? notFoundMetadata
+    const canonicalUrl = new URL(pathname, SITE_URL).toString()
+    const isKnownPage = pathname in pageMetadata
 
     document.title = metadata.title
     updateMetaContent('meta[name="description"]', metadata.description)
+    updateMetaContent('meta[name="robots"]', isKnownPage ? 'index, follow' : 'noindex, nofollow')
     updateMetaContent('meta[property="og:title"]', metadata.title)
     updateMetaContent('meta[property="og:description"]', metadata.description)
+    updateMetaContent('meta[property="og:url"]', canonicalUrl)
+    updateLinkHref('link[rel="canonical"]', canonicalUrl)
   }, [pathname])
 
   return null
